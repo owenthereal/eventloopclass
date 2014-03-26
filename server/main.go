@@ -16,7 +16,8 @@ func main() {
 	acceptingFd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM, 0)
 	check(err)
 
-	err = syscall.Bind(acceptingFd, &syscall.SockaddrInet4{Port: 3000, Addr: [4]byte{0, 0, 0, 0}})
+	addr := &syscall.SockaddrInet4{Port: 3000, Addr: [4]byte{0, 0, 0, 0}}
+	err = syscall.Bind(acceptingFd, addr)
 	check(err)
 
 	err = syscall.Listen(acceptingFd, 100)
@@ -32,7 +33,10 @@ func main() {
 		check(err)
 		fmt.Printf("Received: %s\n", string(data))
 
-		syscall.Write(connectionFd, data)
-		syscall.Close(connectionFd)
+		_, err = syscall.Write(connectionFd, data)
+		check(err)
+
+		err = syscall.Close(connectionFd)
+		check(err)
 	}
 }
