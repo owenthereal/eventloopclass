@@ -28,6 +28,13 @@ func main() {
 		check(err)
 		fmt.Println("Accepted new connectrion")
 
+		err = syscall.SetNonblock(connectionFd, true)
+		check(err)
+
+		fdSet := &syscall.FdSet{Bits: [32]int32{int32(connectionFd)}}
+		err = syscall.Select(connectionFd+1, fdSet, nil, nil, nil)
+		check(err)
+
 		data := make([]byte, 1024)
 		_, err = syscall.Read(connectionFd, data)
 		check(err)
